@@ -608,6 +608,190 @@ plt.show()
 
 ---
 
+## 🌐 Web Application (Interactive Inference)
+
+### Web Interface Features
+
+We've created a **beautiful, modern web application** for easy inference without command-line knowledge!
+
+✨ **Features:**
+- 🎨 Modern dark theme with gradient accents
+- 📤 Drag & drop file upload for all 4 MRI modalities
+- ⏱️ Real-time progress tracking
+- 📊 Interactive visualizations with segmentation overlays
+- 📈 Detailed statistics (tumor volume, percentages)
+- 💾 Download results in NIfTI format
+- 📱 Responsive design (works on mobile/tablet)
+- 🚀 Fast inference with GPU acceleration
+
+### Quick Start Guide
+
+#### 1. Install Web Dependencies
+
+```bash
+cd CVFinalProject/web_app
+pip install -r requirements_web.txt
+```
+
+#### 2. Verify Model Location
+
+Ensure `best_model.pth` is in the correct location:
+```
+CVFinalProject/
+├── best_model.pth         ✓ Model here
+└── web_app/
+    └── app.py
+```
+
+#### 3. Start the Server
+
+```bash
+python app.py
+```
+
+**Expected Output:**
+```
+============================================================
+Brain Tumor Segmentation Web Application
+============================================================
+
+Using device: cuda
+Model loaded from: ../best_model.pth
+
+✅ Model loaded successfully!
+✅ Device: cuda
+
+Starting web server...
+Access the application at: http://localhost:5000
+============================================================
+```
+
+#### 4. Open in Browser
+
+Navigate to: **http://localhost:5000**
+
+### How to Use the Web Interface
+
+**Step 1: Upload MRI Scans**
+1. Click on each upload box (T1, T1ce, T2, FLAIR)
+2. Select the corresponding `.nii` or `.nii.gz` file
+3. All 4 modalities must be uploaded
+
+**Step 2: Run Inference**
+1. Click "Upload Files" button
+2. Files upload automatically (progress shown)
+3. Inference starts automatically
+4. Processing steps displayed with real-time updates
+
+**Step 3: View Results**
+- **Statistics Panel:** Tumor volumes and percentages for WT, TC, ET
+- **Visualizations:** Multiple axial slices showing:
+  - Original FLAIR MRI
+  - Segmentation mask (color-coded)
+  - Overlay on MRI
+- **Color Legend:**
+  - 🔴 Red = Enhancing Tumor (ET)
+  - 🟡 Yellow = Tumor Core (TC)
+  - 🟢 Green = Whole Tumor (WT)
+
+**Step 4: Download Results**
+- Combined segmentation (BraTS format)
+- Individual masks (WT, TC, ET)
+- All in NIfTI format ready for analysis
+
+**Step 5: Process New Scan**
+- Click "New Scan" to upload and analyze another patient
+
+### API Endpoints
+
+The web app provides RESTful APIs:
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/status` | GET | Check model status |
+| `/api/upload` | POST | Upload MRI files |
+| `/api/predict/<id>` | POST | Run inference |
+| `/api/download/<id>/<file>` | GET | Download results |
+| `/api/cleanup/<id>` | DELETE | Clean session |
+
+### Web App File Structure
+
+```
+web_app/
+├── app.py                    # Flask backend (inference engine)
+├── requirements_web.txt      # Web dependencies
+├── templates/
+│   └── index.html           # Modern HTML interface
+├── static/
+│   ├── css/
+│   │   └── style.css        # Dark theme styling
+│   └── js/
+│       └── main.js          # Frontend logic
+├── uploads/                 # Temporary uploads (auto-created)
+└── results/                 # Inference results (auto-created)
+```
+
+### Configuration Options
+
+**Change Port:**
+Edit `app.py`, line 451:
+```python
+app.run(debug=True, host='0.0.0.0', port=5000)  # Change port here
+```
+
+**Adjust Upload Limit:**
+Edit `app.py`, line 28:
+```python
+app.config['MAX_CONTENT_LENGTH'] = 500 * 1024 * 1024  # 500 MB
+```
+
+**Modify Inference Parameters:**
+Edit `app.py`, line 76:
+```python
+def sliding_window_inference(volume, patch_size=128, overlap=0.5):
+    # Adjust for speed/accuracy trade-off
+```
+
+### Deployment Options
+
+**Local Network Access:**
+```bash
+# Server will be accessible from other devices on your network
+python app.py
+# Then access via: http://<your-ip>:5000
+```
+
+**Production Deployment:**
+```bash
+# Install Gunicorn
+pip install gunicorn
+
+# Run with production server
+gunicorn -w 4 -b 0.0.0.0:5000 app:app
+```
+
+**Docker Deployment:**
+```bash
+# See web_app directory for Dockerfile
+docker build -t brain-tumor-seg .
+docker run -p 5000:5000 brain-tumor-seg
+```
+
+### Web App Screenshots
+
+**Home Screen:**
+- Modern hero section with feature highlights
+- Intuitive upload interface for all 4 modalities
+- Real-time file selection feedback
+
+**Results Screen:**
+- Beautiful statistics cards showing tumor metrics
+- Interactive visualizations with multiple slices
+- One-click download for all results
+- Professional medical imaging interface
+
+---
+
 ## 📊 Expected Outputs
 
 ### Training Metrics (Colab Configuration)
