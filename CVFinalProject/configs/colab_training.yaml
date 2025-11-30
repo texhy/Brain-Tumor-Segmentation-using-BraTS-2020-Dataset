@@ -1,0 +1,47 @@
+# Colab Training Configuration (VS Code Extension)
+# Optimized for Google Colab Pro with L4/T4 GPU
+# Dataset: Local files synced via VS Code Colab extension
+# Expected training time: 15-20 hours
+# Expected Dice scores: WT ~82%, TC ~77%, ET ~74%
+
+data:
+  # Path will be relative to workspace root when using VS Code Colab
+  data_dir: "dataset/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
+  num_train_subjects: 150
+  num_val_subjects: 30
+  patch_size: 128
+  overlap: 0.5
+  num_workers: 0  # Set to 0 to avoid memory issues
+
+model:
+  in_channels: 4
+  num_classes: 3
+  base_channels: 32
+  use_transformer: true
+  transformer_heads: 8
+
+training:
+  epochs: 65
+  batch_size: 1  # Match paper, Colab has good VRAM
+  learning_rate: 0.0003
+  accumulation_steps: 1  # No need with batch_size=1
+  dice_weight: 0.5
+  ce_weight: 0.5
+
+optimization:
+  optimizer: "AdamW"
+  weight_decay: 0.00001  # Match paper (1e-5)
+  scheduler: "cosine"
+
+aws:
+  s3_bucket: null  # Disable S3 for Colab
+  s3_checkpoint_path: ""
+
+checkpoint:
+  save_dir: "./checkpoints_colab"  # Save to local workspace
+  save_frequency: 10  # Save every 10 epochs
+
+test_mode:
+  enabled: false
+  num_subjects: 1
+  num_patches: 10

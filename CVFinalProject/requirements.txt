@@ -1,0 +1,26 @@
+# Deep Learning Framework
+torch>=2.0.0
+torchvision>=0.15.0
+
+# Medical Imaging
+nibabel>=5.0.0
+scipy>=1.10.0
+
+# Configuration
+pyyaml>=6.0
+python-dotenv>=1.0.0
+
+# AWS Integration
+boto3>=1.26.0
+
+# Dataset Download
+kagglehub>=0.2.0
+
+# Testing
+hypothesis>=6.82.0
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# Utilities
+numpy>=1.24.0
+tqdm>=4.65.0

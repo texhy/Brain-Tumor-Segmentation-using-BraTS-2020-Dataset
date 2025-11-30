@@ -1,0 +1,43 @@
+# BraTS 2020 Training Configuration
+# Optimized for AWS EC2 g4dn.xlarge (NVIDIA T4 16GB GPU)
+
+data:
+  data_dir: "./data/BraTS2020"
+  num_train_subjects: 25
+  num_val_subjects: 5
+  patch_size: 128
+  overlap: 0.5
+  num_workers: 4
+
+model:
+  in_channels: 4
+  num_classes: 3
+  base_channels: 32
+  use_transformer: true
+  transformer_heads: 8
+
+training:
+  epochs: 30
+  batch_size: 2
+  learning_rate: 0.0003
+  accumulation_steps: 4
+  dice_weight: 0.5
+  ce_weight: 0.5
+
+optimization:
+  optimizer: "AdamW"
+  weight_decay: 0.0001
+  scheduler: "cosine"
+
+aws:
+  s3_bucket: "your-bucket-name" # Replace with your S3 bucket
+  s3_checkpoint_path: "checkpoints/brats2020/"
+
+checkpoint:
+  save_dir: "./checkpoints"
+  save_frequency: 1 # Save every N epochs
+
+test_mode:
+  enabled: false
+  num_subjects: 1
+  num_patches: 10

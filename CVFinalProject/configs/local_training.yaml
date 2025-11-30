@@ -1,0 +1,41 @@
+# Local Training Configuration for RTX 4070 Super
+data:
+  data_dir: "e:/CV_Project/dataset/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
+  num_train_subjects: 25
+  num_val_subjects: 5
+  patch_size: 128
+  overlap: 0.5
+  num_workers: 0
+
+model:
+  in_channels: 4
+  num_classes: 3
+  base_channels: 32
+  use_transformer: true
+  transformer_heads: 8
+
+training:
+  epochs: 30
+  batch_size: 2  # Adjusted for 12GB VRAM
+  learning_rate: 0.0003
+  accumulation_steps: 4
+  dice_weight: 0.5
+  ce_weight: 0.5
+
+optimization:
+  optimizer: "AdamW"
+  weight_decay: 0.0001
+  scheduler: "cosine"
+
+aws:
+  s3_bucket: null  # Disable S3 upload for local training
+  s3_checkpoint_path: ""
+
+checkpoint:
+  save_dir: "./checkpoints"
+  save_frequency: 5 # Save every N epochs
+
+test_mode:
+  enabled: false
+  num_subjects: 1
+  num_patches: 10

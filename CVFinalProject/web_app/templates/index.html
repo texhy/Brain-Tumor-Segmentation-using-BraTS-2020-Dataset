@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brain Tumor Segmentation - AI Medical Imaging</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="container">
+            <div class="header-content">
+                <div class="logo">
+                    <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <circle cx="20" cy="20" r="18" stroke="url(#gradient)" stroke-width="3"/>
+                        <path d="M20 10 L20 30 M10 20 L30 20" stroke="url(#gradient)" stroke-width="3" stroke-linecap="round"/>
+                        <defs>
+                            <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+                                <stop offset="0%" style="stop-color:#6366f1;stop-opacity:1" />
+                                <stop offset="100%" style="stop-color:#8b5cf6;stop-opacity:1" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                    <h1>NeuroScan AI</h1>
+                </div>
+                <div class="status-indicator" id="statusIndicator">
+                    <span class="status-dot"></span>
+                    <span class="status-text">Loading...</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <div class="container">
+            <!-- Hero Section -->
+            <section class="hero">
+                <h2>Advanced Brain Tumor Segmentation</h2>
+                <p>Upload multi-modal MRI scans for automated tumor segmentation using deep learning</p>
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🧠</div>
+                        <h3>3D U-Net</h3>
+                        <p>State-of-the-art architecture</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Fast Inference</h3>
+                        <p>Results in minutes</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>High Accuracy</h3>
+                        <p>82% Dice score on WT</p>
+                    </div>
+                    <div class="feature-card">
+                        <div class="feature-icon">📊</div>
+                        <h3>3 Regions</h3>
+                        <p>WT, TC, ET segmentation</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section class="upload-section" id="uploadSection">
+                <div class="card">
+                    <h3>Upload MRI Scans</h3>
+                    <p class="subtitle">Please upload all four modalities in NIfTI format (.nii or .nii.gz)</p>
+                    
+                    <div class="upload-grid">
+                        <!-- T1 Upload -->
+                        <div class="upload-item">
+                            <label for="t1-upload" class="upload-label">
+                                <div class="upload-icon">📁</div>
+                                <span class="upload-title">T1-weighted</span>
+                                <span class="upload-subtitle" id="t1-filename">No file chosen</span>
+                                <input type="file" id="t1-upload" accept=".nii,.nii.gz" hidden>
+                            </label>
+                            <div class="upload-status" id="t1-status"></div>
+                        </div>
+
+                        <!-- T1ce Upload -->
+                        <div class="upload-item">
+                            <label for="t1ce-upload" class="upload-label">
+                                <div class="upload-icon">📁</div>
+                                <span class="upload-title">T1ce (Contrast)</span>
+                                <span class="upload-subtitle" id="t1ce-filename">No file chosen</span>
+                                <input type="file" id="t1ce-upload" accept=".nii,.nii.gz" hidden>
+                            </label>
+                            <div class="upload-status" id="t1ce-status"></div>
+                        </div>
+
+                        <!-- T2 Upload -->
+                        <div class="upload-item">
+                            <label for="t2-upload" class="upload-label">
+                                <div class="upload-icon">📁</div>
+                                <span class="upload-title">T2-weighted</span>
+                                <span class="upload-subtitle" id="t2-filename">No file chosen</span>
+                                <input type="file" id="t2-upload" accept=".nii,.nii.gz" hidden>
+                            </label>
+                            <div class="upload-status" id="t2-status"></div>
+                        </div>
+
+                        <!-- FLAIR Upload -->
+                        <div class="upload-item">
+                            <label for="flair-upload" class="upload-label">
+                                <div class="upload-icon">📁</div>
+                                <span class="upload-title">FLAIR</span>
+                                <span class="upload-subtitle" id="flair-filename">No file chosen</span>
+                                <input type="file" id="flair-upload" accept=".nii,.nii.gz" hidden>
+                            </label>
+                            <div class="upload-status" id="flair-status"></div>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn btn-primary" id="uploadBtn" disabled>
+                            <span class="btn-icon">⬆️</span>
+                            Upload Files
+                        </button>
+                        <button class="btn btn-secondary" id="clearBtn">
+                            <span class="btn-icon">🗑️</span>
+                            Clear All
+                        </button>
+                    </div>
+
+                    <div class="upload-progress hidden" id="uploadProgress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="uploadProgressFill"></div>
+                        </div>
+                        <p class="progress-text" id="uploadProgressText">Uploading...</p>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Processing Section -->
+            <section class="processing-section hidden" id="processingSection">
+                <div class="card">
+                    <h3>Running Inference</h3>
+                    <p class="subtitle">Please wait while the model processes your MRI scans...</p>
+                    
+                    <div class="processing-animation">
+                        <div class="spinner"></div>
+                        <p class="processing-text" id="processingText">Initializing model...</p>
+                    </div>
+
+                    <div class="processing-steps">
+                        <div class="step" id="step1">
+                            <div class="step-icon">⏳</div>
+                            <span>Loading volumes</span>
+                        </div>
+                        <div class="step" id="step2">
+                            <div class="step-icon">⏳</div>
+                            <span>Normalizing data</span>
+                        </div>
+                        <div class="step" id="step3">
+                            <div class="step-icon">⏳</div>
+                            <span>Running inference</span>
+                        </div>
+                        <div class="step" id="step4">
+                            <div class="step-icon">⏳</div>
+                            <span>Generating results</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section hidden" id="resultsSection">
+                <div class="card">
+                    <div class="results-header">
+                        <h3>Segmentation Results</h3>
+                        <button class="btn btn-secondary" id="newScanBtn">
+                            <span class="btn-icon">➕</span>
+                            New Scan
+                        </button>
+                    </div>
+
+                    <!-- Statistics -->
+                    <div class="stats-grid" id="statsGrid">
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #10b981 0%, #059669 100%);">🟢</div>
+                            <div class="stat-content">
+                                <span class="stat-label">Whole Tumor (WT)</span>
+                                <span class="stat-value" id="wtVolume">-</span>
+                                <span class="stat-percentage" id="wtPercentage">-</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);">🟡</div>
+                            <div class="stat-content">
+                                <span class="stat-label">Tumor Core (TC)</span>
+                                <span class="stat-value" id="tcVolume">-</span>
+                                <span class="stat-percentage" id="tcPercentage">-</span>
+                            </div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-icon" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);">🔴</div>
+                            <div class="stat-content">
+                                <span class="stat-label">Enhancing Tumor (ET)</span>
+                                <span class="stat-value" id="etVolume">-</span>
+                                <span class="stat-percentage" id="etPercentage">-</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Visualizations -->
+                    <div class="visualizations" id="visualizations">
+                        <h4>Segmentation Overlay</h4>
+                        <div class="visualization-container" id="visualizationContainer">
+                            <!-- Images will be inserted here dynamically -->
+                        </div>
+                    </div>
+
+                    <!-- Download Buttons -->
+                    <div class="download-section">
+                        <h4>Download Results</h4>
+                        <div class="download-buttons">
+                            <button class="btn btn-download" data-file="segmentation.nii.gz">
+                                <span class="btn-icon">💾</span>
+                                Combined Segmentation
+                            </button>
+                            <button class="btn btn-download" data-file="wt.nii.gz">
+                                <span class="btn-icon">💾</span>
+                                Whole Tumor Mask
+                            </button>
+                            <button class="btn btn-download" data-file="tc.nii.gz">
+                                <span class="btn-icon">💾</span>
+                                Tumor Core Mask
+                            </button>
+                            <button class="btn btn-download" data-file="et.nii.gz">
+                                <span class="btn-icon">💾</span>
+                                Enhancing Tumor Mask
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Error Section -->
+            <section class="error-section hidden" id="errorSection">
+                <div class="card error-card">
+                    <div class="error-icon">⚠️</div>
+                    <h3>Error</h3>
+                    <p id="errorMessage">An error occurred during processing.</p>
+                    <button class="btn btn-primary" id="retryBtn">
+                        <span class="btn-icon">🔄</span>
+                        Try Again
+                    </button>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2025 NeuroScan AI - Brain Tumor Segmentation System</p>
+            <p>Powered by 3D U-Net with Contextual Transformer | BraTS 2020 Dataset</p>
+        </div>
+    </footer>
+
+    <!-- Toast Notifications -->
+    <div class="toast-container" id="toastContainer"></div>
+
+    <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+</body>
+</html>

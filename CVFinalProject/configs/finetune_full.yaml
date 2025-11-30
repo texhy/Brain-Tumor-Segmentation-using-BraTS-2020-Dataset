@@ -1,0 +1,42 @@
+# Fine-Tuning Configuration (Full Dataset, A100)
+data:
+  data_dir: "/content/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData"
+  # Total subjects is 369. We use 300 for train, 69 for val.
+  num_train_subjects: 300
+  num_val_subjects: 69
+  patch_size: 128
+  overlap: 0.5
+  num_workers: 4
+
+model:
+  in_channels: 4
+  num_classes: 3
+  base_channels: 32
+  use_transformer: true
+  transformer_heads: 8
+
+training:
+  epochs: 40
+  batch_size: 2
+  learning_rate: 0.00001  # Low LR for fine-tuning (1e-5)
+  accumulation_steps: 1
+  dice_weight: 0.5
+  ce_weight: 0.5
+
+optimization:
+  optimizer: "AdamW"
+  weight_decay: 0.00001
+  scheduler: "cosine"
+
+aws:
+  s3_bucket: null
+  s3_checkpoint_path: ""
+
+checkpoint:
+  save_dir: "/content/drive/MyDrive/BraTS_Checkpoints_Finetune"  # New dir to avoid overwriting
+  save_frequency: 5
+
+test_mode:
+  enabled: false
+  num_subjects: 1
+  num_patches: 10
