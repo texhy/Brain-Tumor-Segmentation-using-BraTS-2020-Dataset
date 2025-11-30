@@ -225,7 +225,16 @@ def upload_files():
             if file.filename == '':
                 return jsonify({'error': f'No file selected for {mod}'}), 400
             
-            filename = secure_filename(f"{mod}.nii.gz")
+            # Detect file extension from uploaded file
+            original_filename = secure_filename(file.filename)
+            if original_filename.endswith('.nii.gz'):
+                ext = '.nii.gz'
+            elif original_filename.endswith('.nii'):
+                ext = '.nii'
+            else:
+                ext = '.nii'  # Default to .nii
+            
+            filename = f"{mod}{ext}"
             filepath = os.path.join(session_folder, filename)
             file.save(filepath)
             file_paths[mod] = filepath
@@ -258,7 +267,15 @@ def predict(session_id):
         affine = None
         
         for mod in modalities:
-            filepath = os.path.join(session_folder, f"{mod}.nii.gz")
+            # Try both .nii.gz and .nii extensions
+            filepath_gz = os.path.join(session_folder, f"{mod}.nii.gz")
+            filepath = os.path.join(session_folder, f"{mod}.nii")
+            
+            if os.path.exists(filepath_gz):
+                filepath = filepath_gz
+            elif not os.path.exists(filepath):
+                return jsonify({'error': f'File not found for {mod}'}), 404
+            
             nii = nib.load(filepath)
             volume = nii.get_fdata().astype(np.float32)
             volumes.append(volume)
